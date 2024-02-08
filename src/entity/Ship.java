@@ -2,12 +2,12 @@ package entity;
 
 public class Ship {
 
-    private int[][] position;
+    private int[] position;
     private int cellsCount;
     private boolean[] cellsState;
     private boolean isVertical;
 
-    public Ship(int[][] position, int cellsCount, boolean[] cellsState, boolean isVertical) {
+    public Ship(int[] position, int cellsCount, boolean[] cellsState, boolean isVertical) {
         this.position = position;
         this.cellsCount = cellsCount;
         this.cellsState = cellsState;
@@ -17,11 +17,11 @@ public class Ship {
     public Ship() {
     }
 
-    public int[][] getPosition() {
+    public int[] getPosition() {
         return position;
     }
 
-    public void setPosition(int[][] position) {
+    public void setPosition(int[] position) {
         this.position = position;
     }
 

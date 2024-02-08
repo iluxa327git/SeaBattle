@@ -4,7 +4,7 @@ import entity.enums.Role;
 
 public class Player {
     private String name;
-    private Role role = Role.USER;
+    private Role role;
 
     public Player(String name, Role role) {
         this.name = name;
@@ -13,6 +13,7 @@ public class Player {
 
     public Player() {
         this.name = "";
+        this.role = Role.USER;
     }
 
     public String getName() {

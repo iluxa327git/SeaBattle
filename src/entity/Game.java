@@ -1,8 +1,8 @@
 package entity;
 
 public class Game {
-    private Player[] players = new Player[2];
-    private Map[] maps = new Map[2];
+    private Player[] players;
+    private Map[] maps;
 
     public Game(Player[] players, Map[] maps) {
         this.players = players;
@@ -10,6 +10,8 @@ public class Game {
     }
 
     public Game() {
+        this.players = new Player[2];
+        this.maps = new Map[2];
     }
 
     public Player[] getPlayers() {
