@@ -6,7 +6,6 @@ import entity.Ship;
 import service.MapServiceImp;
 import service.ShipServiceImp;
 import entity.Map;
-import service.TmpCheckout;
 
 import java.util.Scanner;
 
@@ -75,7 +74,7 @@ public class Menu {
         player1.setName(scanner.next());
 
         System.out.println("Ввод первого игрока: ");
-        Map[] maps1 = new Map[]{TmpCheckout.getRandomField(), new Map()}; //TODO get back GetMaps()
+        Map[] maps1 = new Map[]{MapServiceImp.getRandomMap(), new Map()}; //TODO get back GetMaps()
 
         mapServiceImp.printMap(maps1);
 
@@ -83,7 +82,7 @@ public class Menu {
         player2.setName(scanner.next());
 
         System.out.println("Ввод второго игрока: ");
-        Map[] maps2 = new Map[]{TmpCheckout.getRandomField(), new Map()}; //TODO get back GetMaps()
+        Map[] maps2 = new Map[]{MapServiceImp.getRandomMap(), new Map()}; //TODO get back GetMaps()
 
         mapServiceImp.printMap(maps2);
 

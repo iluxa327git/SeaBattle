@@ -2,8 +2,46 @@ package service;
 
 import entity.Map;
 import entity.Ship;
+import utils.Randomizer;
+
 
 public class MapServiceImp implements MapService{
+
+    public static Map getRandomMap() {
+        Map map = new Map();
+
+        int counter = 0;
+
+        for (int i = 0; i < 6; ++i)
+            for (int ii = 0; ii < 6 - i; ++ii) {
+                Ship ship = new Ship();
+
+                ship.setCellsCount(i + 1);
+                ship.setCellsState(new boolean[i + 1]);
+                ship.setPosition(Randomizer.getRandomShipPos());
+                ship.setVertical(Randomizer.getRandomBoolean());
+
+                map.getShips()[counter] = ship;
+
+                counter++;
+            }
+
+        for (Ship ship : map.getShips()) {
+            while (!ShipServiceImp.isCorrect(ship, map.getMap())) {
+                ship.setPosition(Randomizer.getRandomShipPos());
+                ship.setVertical(Randomizer.getRandomBoolean());
+            }
+
+            if (ship.isVertical())
+                map.setMap(ShipServiceImp.vertical(map.getMap(), ship));
+
+            else
+                map.setMap(ShipServiceImp.horizontal(map.getMap(), ship));
+
+        }
+
+        return map;
+    }
 
     public Map generateMap(Ship[] ships){
         Map map = new Map();
