@@ -12,7 +12,7 @@ public class MapServiceImp implements MapService{
 
         int counter = 0;
 
-        for (int i = 0; i < 6; ++i)
+        for (int i = 5; i >= 0; --i)
             for (int ii = 0; ii < 6 - i; ++ii) {
                 Ship ship = new Ship();
 

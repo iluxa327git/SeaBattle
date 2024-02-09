@@ -3,6 +3,7 @@ package utils;
 import entity.Match;
 import entity.Player;
 import entity.Ship;
+import entity.enums.Role;
 import service.MapServiceImp;
 import service.ShipServiceImp;
 import entity.Map;
@@ -33,7 +34,7 @@ public class Menu {
                     ship.setVertical(true);
 
                 if(!ShipServiceImp.isCorrect(ship, maps[0].getMap()))
-                    System.out.println("ХУЙ");
+                    System.out.println("Неврено введены координаты");
             }while(position[0] < 0 || position[1] < 0 || !ShipServiceImp.isCorrect(ship, maps[0].getMap()));
 
             if (ship.isVertical())
@@ -64,101 +65,338 @@ public class Menu {
     }
 
     public static void game(){
-        Match match = new Match();
+
         MapServiceImp mapServiceImp = new MapServiceImp();
 
-        Player player1 = new Player();
-        Player player2 = new Player();
+        int gameMod;
+
+        do {
+            System.out.println("Игра с другом/Игра с ботом(1/2)");
+            gameMod = scanner.nextInt();
+
+            switch (gameMod){
+                case 1:
+                    multiplayer();
+
+
+
+                    break;
+
+                case 2:
+                    singleplayer();
+                    break;
+
+                default:
+                    System.out.println("XYZ");
+                    break;
+            }
+        }while(gameMod != 1 && gameMod != 0);
+
+        /*switch(gameMod){
+            case 1:
+                Player player1 = new Player();
+                Player player2 = new Player();
+
+                //1
+                System.out.println("Введите имя первого игрока: ");
+                player1.setName(scanner.next());
+
+                System.out.println("Поле рандомное/Поле вручную(1/2)");
+                int mod1 = scanner.nextInt();
+
+                Map[] maps1 = new Map[2];
+
+                do {
+                    switch (mod1) {
+                        case 1:
+                            System.out.println("Ввод первого игрока: ");
+                            maps1 = new Map[]{MapServiceImp.getRandomMap(), new Map()};
+                        case 2:
+                            System.out.println("Ввод первого игрока: ");
+                            maps1 = GenerateMaps();
+                        default:
+                            System.out.println("Неверный ввод");
+                    }
+
+                    mapServiceImp.printMap(maps1);
+
+                }while(mod1 != 0 && mod1 != 1);
+
+                //2
+                System.out.println("Введите имя второго игрока: ");
+                player1.setName(scanner.next());
+
+                System.out.println("Поле рандомное/Поле вручную(1/2)");
+                int mod2 = scanner.nextInt();
+
+                Map[] maps2 = new Map[2];
+
+                do {
+                    switch (mod2) {
+                        case 1:
+                            System.out.println("Ввод первого игрока: ");
+                            maps2 = new Map[]{MapServiceImp.getRandomMap(), new Map()};
+                        case 2:
+                            System.out.println("Ввод первого игрока: ");
+                            maps2 = GenerateMaps();
+                        default:
+                            System.out.println("Неверный ввод");
+                    }
+
+                    mapServiceImp.printMap(maps1);
+
+                }while(mod2 != 0 && mod2 != 1);
+
+                match.getMatch().put(player1, maps1);
+                match.getMatch().put(player2, maps2);
+
+
+
+
+
+
+
+
+
+        //Player bot = new Player();
+        //Map[] mapsBot = new Map[2];
+        //mapsBot = new Map[]{MapServiceImp.getRandomMap(), new Map()};
+        }*/
+    }
+
+    private static void singleplayer(){
+        Match match = new Match();
+
+        Player player = new Player();
+        player.setRole(Role.USER);
+
+        Player bot = new Player("Bot", Role.BOT);
 
         System.out.println("Введите имя первого игрока: ");
-        player1.setName(scanner.next());
+        player.setName(scanner.next());
 
-        System.out.println("Ввод первого игрока: ");
-        Map[] maps1 = new Map[]{MapServiceImp.getRandomMap(), new Map()}; //TODO get back GetMaps()
+        System.out.println("Поле рандомное/Поле вручную(1/2)");
+        int choice;
 
-        mapServiceImp.printMap(maps1);
+        do{
+            choice = scanner.nextInt();
 
+            switch (choice){
+                case 1:
+                    match.getMatch().put(player, new Map[]{MapServiceImp.getRandomMap(), new Map()});
+                    mapServiceImp.printMap(match.getMatch().get(player));
+
+                    break;
+
+                case 2:
+                    match.getMatch().put(player, GenerateMaps());
+                    break;
+
+                default:
+                    System.out.println("Неверный ввод");
+                    break;
+            }
+
+        } while (!(choice == 1 || choice == 2));
+
+        match.getMatch().put(bot, new Map[]{MapServiceImp.getRandomMap(), new Map()});
+
+        boolean isGameOver = false;
+        boolean isPlayer = true;
+
+        int firstPlayerKilledCells = 0;
+        int secondPlayerKilledCells = 0;
+
+        while(!isGameOver){
+            if(isPlayer){
+                System.out.println(String.format("Ход игрока %s", player.getName()));
+                int[] attack1 = attackCord(match.getMatch().get(player));
+
+                if(match.getMatch().get(bot)[0].getMap()[attack1[0]][attack1[1]] == 2){
+                    match.getMatch().get(player)[1].getMap()[attack1[0]][attack1[1]] = 4;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(player));
+                    System.out.println("ПОПАЛ!");
+
+                    firstPlayerKilledCells += 1;
+                    if(firstPlayerKilledCells == 56) {
+                        System.out.println(String.format("Победил игрок: %s", bot.getName()));
+                        System.out.println("ГЕЙМ ОВЕР");
+                        break;
+                    }
+                }
+                else {
+                    match.getMatch().get(player)[1].getMap()[attack1[0]][attack1[1]] = 3;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(player));
+
+                    System.out.println("Промах, для перехода хода введите что-нибудь: ");
+
+                    scanner.next();
+
+                    isPlayer = !isPlayer;
+                }
+            }
+            else{
+                int[] attack2 = Randomizer.getRandomShipPos();
+
+                System.out.println(String.format("Ход игрока: %s", bot.getName()));
+
+                if(match.getMatch().get(player)[0].getMap()[attack2[0]][attack2[1]] == 2){
+                    match.getMatch().get(bot)[1].getMap()[attack2[0]][attack2[1]] = 4;
+                    System.out.println("БОТ ПОПАЛ!");
+
+                    secondPlayerKilledCells += 1;
+                    if(secondPlayerKilledCells == 56) {
+                        System.out.println(String.format("ПОбедил игрок: %s", player.getName()));
+                        System.out.println("ГЕЙМ ОВЕР");
+                        break;
+                    }
+                }
+                else {
+                    match.getMatch().get(bot)[1].getMap()[attack2[0]][attack2[1]] = 3;
+
+
+                    System.out.println("БОТ ПРОМАЗАЛ!");
+                    mapServiceImp.gamePrintMap(match.getMatch().get(player));
+
+                    isPlayer = !isPlayer;
+
+                }
+            }
+
+        }
+
+        //Игра с ботом
+    }
+
+    private static void  multiplayer(){
+        Match match = new Match();
+
+        Player firstPlayer = new Player();
+        Player secondPlayer = new Player();
+
+        //1
+        System.out.println("Введите имя первого игрока: ");
+        firstPlayer.setName(scanner.next());
+
+        System.out.println("Поле рандомное/Поле вручную(1/2)");
+        int choice;
+
+        do{
+            choice = scanner.nextInt();
+
+            switch (choice){
+                case 1:
+                    match.getMatch().put(firstPlayer, new Map[]{MapServiceImp.getRandomMap(), new Map()});
+                    mapServiceImp.printMap(match.getMatch().get(firstPlayer));
+                    break;
+
+                case 2:
+                    match.getMatch().put(firstPlayer, GenerateMaps());
+                    break;
+
+                default:
+                    System.out.println("Неверный ввод");
+                    break;
+            }
+
+        } while (!(choice == 1 || choice == 2));
+
+        //2
         System.out.println("Введите имя второго игрока: ");
-        player2.setName(scanner.next());
+        secondPlayer.setName(scanner.next());
 
-        System.out.println("Ввод второго игрока: ");
-        Map[] maps2 = new Map[]{MapServiceImp.getRandomMap(), new Map()}; //TODO get back GetMaps()
+        System.out.println("Поле рандомное/Поле вручную(1/2)");
 
-        mapServiceImp.printMap(maps2);
+        do{
+            choice = scanner.nextInt();
 
-        match.getMatch().put(player1, maps1);
-        match.getMatch().put(player2, maps2);
+            switch (choice){
+                case 1:
+                    match.getMatch().put(secondPlayer, new Map[]{MapServiceImp.getRandomMap(), new Map()});
+                    mapServiceImp.printMap(match.getMatch().get(secondPlayer));
+                    break;
+
+                case 2:
+                    match.getMatch().put(secondPlayer, GenerateMaps());
+                    break;
+
+                default:
+                    System.out.println("Неверный ввод");
+                    break;
+            }
+        } while (!(choice == 1 || choice == 2));
 
         boolean isGameOver = false;
         boolean isPlayer1 = true;
 
-        int killCount1 = 0;
-        int killCount2 = 0;
+        int firstPlayerKilledCells = 0;
+        int secondPlayerKilledCells = 0;
 
         while(!isGameOver){
             if(isPlayer1){
                 int[] attack1 = new int[2];
 
-                System.out.println(String.format("Ход игрока %s", player1.getName()));
-                attack1 = attackCord(maps1);
+                System.out.println(String.format("Ход игрока %s", firstPlayer.getName()));
+                attack1 = attackCord(match.getMatch().get(firstPlayer));
 
-                if(maps2[0].getMap()[attack1[0]][attack1[1]] == 2){
-                    maps1[1].getMap()[attack1[0]][attack1[1]] = 4;
-                    mapServiceImp.gamePrintMap(maps1);
+                if(match.getMatch().get(secondPlayer)[0].getMap()[attack1[0]][attack1[1]] == 2){
+                    match.getMatch().get(firstPlayer)[1].getMap()[attack1[0]][attack1[1]] = 4;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(firstPlayer));
+                    System.out.println("ПОПАЛ!");
 
-                    killCount2 += 1;
-                    if(killCount2 == 33) {
-                        System.out.println(String.format("ПОбедил игрок: %s", player2.getName()));
+                    firstPlayerKilledCells += 1;
+                    if(firstPlayerKilledCells == 56) {
+                        System.out.println(String.format("ПОбедил игрок: %s", secondPlayer.getName()));
                         System.out.println("ГЕЙМ ОВЕР");
                         break;
                     }
                 }
                 else {
-                    maps1[1].getMap()[attack1[0]][attack1[1]] = 3;
-                    mapServiceImp.gamePrintMap(maps1);
+                    match.getMatch().get(firstPlayer)[1].getMap()[attack1[0]][attack1[1]] = 3;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(firstPlayer));
                     int ind;
                     System.out.println("Промах, для перехода хода введите 1: ");
                     do{
                         ind = scanner.nextInt();
                     }while(ind != 1);
 
-                    mapServiceImp.gamePrintMap(maps2);
+                    mapServiceImp.gamePrintMap(match.getMatch().get(secondPlayer));
                     isPlayer1 = !isPlayer1;
 
                 }
             }
             else{
-                int[] attack2 = new int[2];
+                int[] attack2 = attackCord(match.getMatch().get(secondPlayer));
 
-                System.out.println(String.format("Ход игрока %s", player2.getName()));
-                attack2 = attackCord(maps2);
+                System.out.println(String.format("Ход игрока: %s", secondPlayer.getName()));
 
-                if(maps1[0].getMap()[attack2[0]][attack2[1]] == 2){
-                    maps2[1].getMap()[attack2[0]][attack2[1]] = 4;
-                    mapServiceImp.gamePrintMap(maps2);
+                if(match.getMatch().get(firstPlayer)[0].getMap()[attack2[0]][attack2[1]] == 2){
+                    match.getMatch().get(secondPlayer)[1].getMap()[attack2[0]][attack2[1]] = 4;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(secondPlayer));
 
-                    killCount2 += 1;
-                    if(killCount1 == 33) {
-                        System.out.println(String.format("ПОбедил игрок: %s", player1.getName()));
+                    secondPlayerKilledCells += 1;
+                    if(secondPlayerKilledCells == 56) {
+                        System.out.println(String.format("ПОбедил игрок: %s", firstPlayer.getName()));
                         System.out.println("ГЕЙМ ОВЕР");
                         break;
                     }
                 }
                 else {
-                    maps2[1].getMap()[attack2[0]][attack2[1]] = 3;
-                    mapServiceImp.gamePrintMap(maps2);
+                    match.getMatch().get(secondPlayer)[1].getMap()[attack2[0]][attack2[1]] = 3;
+                    mapServiceImp.gamePrintMap(match.getMatch().get(secondPlayer));
                     int ind;
                     System.out.println("Промах, для перехода хода введите 1: ");
                     do{
                         ind = scanner.nextInt();
                     }while(ind != 1);
 
-                    mapServiceImp.gamePrintMap(maps1);
+                    mapServiceImp.gamePrintMap(match.getMatch().get(firstPlayer));
                     isPlayer1 = !isPlayer1;
 
                 }
             }
 
         }
+
     }
 }
