@@ -59,9 +59,7 @@ public class MapService {
                 System.out.print(i + " ");
 
             for(int j = 1; j <= 16; ++j)
-                if(myMap.getMap()[i-1][j-1] == 1)
-                    System.out.print("*");
-                else if(myMap.getMap()[i-1][j-1] == 2)
+                if(myMap.getMap()[i-1][j-1] == 2)
                     System.out.print("#");
                 else
                     System.out.print("O");
